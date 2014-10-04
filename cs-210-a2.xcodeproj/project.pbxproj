@@ -24,7 +24,7 @@
 
 /* Begin PBXFileReference section */
 		0594300319DE1EED000C4179 /* cs-210-a2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "cs-210-a2"; sourceTree = BUILT_PRODUCTS_DIR; };
-		0594300619DE1EED000C4179 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		0594300619DE1EED000C4179 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; wrapsLines = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +53,8 @@
 			);
 			name = Products;
 			sourceTree = "<group>";
+			usesTabs = 0;
+			wrapsLines = 0;
 		};
 		0594300519DE1EED000C4179 /* cs-210-a2 */ = {
 			isa = PBXGroup;
@@ -202,6 +204,7 @@
 		0594300B19DE1EED000C4179 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -209,6 +212,7 @@
 		0594300C19DE1EED000C4179 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -232,6 +236,7 @@
 				0594300C19DE1EED000C4179 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -14,10 +14,11 @@
 
 
 
-int * hexToBin( char c ); //return an integer array
-int binToDec( int, int *, int );
-char * decToHex( int );
-int * addBinarys( int * , int * , int);
+int * hexToBinary( char c ); //return an integer array
+int binaryToDecimal( int, int *, int );
+char * decimalToHex( int );
+int addBinaryAndInt( int * , int , int);
+int * decimalToBinary( int );
 
 
 int power(int,int);
@@ -28,26 +29,24 @@ void andFunction( char * );
 void jmpFunction( char * );
 void brFunction( char * );
 int debug = 0;
-void createOBJ( char * );
-void instructions( char * );
-void setPCAddress( char * );
+void createOBJ( const char * );
+void instructions( const char * );
+void setPCAddress( const char * );
 
 static int * pcStarter;
 static int PCintAddress;
-static int pcCounter = 1;
-
-
+static int pcCounter = 0;
 
 
 int main(int argc, const char * argv[]) {
     // insert code here...
     if (argc == 1) {
         printf("Error, need at least one arugs!\n[complete file name] or\n[complete file name] [an integer]\n");
-        return 0;
+
     } else if (argc < 4){
         if (debug == 1)
             printf("arg is: %s \n", argv[1]);
-        //createOBJ(argv[1]);
+        createOBJ(argv[1]);
         if (argc > 2) {
     
             /*
@@ -75,15 +74,15 @@ int main(int argc, const char * argv[]) {
                     printf("point to the next PC counter is: 0x%d\n", pcCounter);
             }*/
 
-            setPCAddress(argv[2]); //read hex value;
+            setPCAddress( argv[2] ); //read hex value;
             
         }
-        instructions(argv[1]);
+        instructions( argv[1] );
         
         printf("Done!\n");
     } else {
         printf("Error! Too many arugs, only take at most two arugs!\n[argu1] or\n[argu1] [argu2]\n");
-        return 0;
+
     }
     
     return 0;
@@ -91,33 +90,38 @@ int main(int argc, const char * argv[]) {
 
 
 // set PC address
-void setPCAddress( char *argu ){
-
+void setPCAddress( const char *argu ){
+    if (debug == 1)
+        printf("loading address is [0x%s]\n", argu);
+    
     int address[16];
     int *i;
-    
-    printf("loading address [");
+    if (debug == 1)
+        printf("loading address [");
     
     int j,k = 0, l = 0;
     for (j = 0; j < 4; j++) {
         
-        i = hexToBin(argu[j]);
+        i = hexToBinary( argu[j] );
         for (l = 0; l < 4; l++) {
             address[k] = i[l];
-            printf("%i",address[k]);
+            if (debug == 1)
+                printf("%i",address[k]);
             k++;
         }
     }
-    printf("]\n");
+    if (debug == 1)
+        printf("]\n");
     pcStarter = address;
     
+    PCintAddress = binaryToDecimal(16,pcStarter,1);
+    
+    if (debug == 1) {
+        printf("address in Deciaml is %i\n", PCintAddress);
+        
+        printf("address in Hex is 0x%x\n", PCintAddress);
+    }
 
-    PCintAddress = binToDec(16,pcStarter,1);
-    
-    printf("address in Deciaml is %i\n", PCintAddress);
-    
-    printf("address in Hex is 0x%x\n", PCintAddress);
-    
 /*
     char *pcAddress;
     pcAddress = decToHex( PCintAddress );
@@ -130,7 +134,7 @@ void setPCAddress( char *argu ){
 
 
 //create a file name as argv[1]
-void createOBJ( char *argu)
+void createOBJ( const char *argu)
 {
     
     FILE * fp;
@@ -149,7 +153,7 @@ void createOBJ( char *argu)
 }
 
 //identify instructions
-void instructions( char *argu)
+void instructions( const char *argu)
 {
     
     char hexCode[4];
@@ -161,9 +165,21 @@ void instructions( char *argu)
     {
         printf("Error, File does not exist!\n");
     } else {
-        //pcCounter += 1;
         while
             (fscanf(file, "%s", hexCode)!= EOF){
+                pcCounter +=1;
+                if (debug == 1){
+                    /*
+                     int i;
+                     printf("\[%d]address is [",pcCounter);
+                     for (i = 0; i < 15; i++) {
+                     //partOfaddress[i] = *(pcStarter(7 + i));
+                     printf("%d",pcStarter[i]);
+                     }
+                     printf("]\n");
+                     */
+                    printf("pcCount is %d in while is 0x%x!\n", pcCounter, pcCounter + PCintAddress);
+                }
                 switch (hexCode[0]) {
                     case '0':
                         if (debug == 1) {
@@ -245,21 +261,10 @@ void instructions( char *argu)
                         break;
                         
                     default:
+                        pcCounter -=1;
                         printf("Error, The input value is %s, it is not valid!\n", hexCode);
                         break;
                 }
-                pcCounter +=1;
-                
-                int i;
-                printf("\[%d]address is [",pcCounter);
-                for (i = 0; i < 15; i++) {
-                    //partOfaddress[i] = *(pcStarter(7 + i));
-                    printf("%d",pcStarter[i]);
-                }
-                printf("]\n");
-                
-                if (debug == 1)
-                    printf("pcCount in while is 0x%d!\n", pcCounter);
             }
         
         fclose(file);
@@ -276,34 +281,34 @@ void addFunction( char *addressOfchars)
     int binNums[3];
     int r1,r2,r3,imm5 = 0;
 
-    c = hexToBin(*(addressOfchars + 1));
+    c = hexToBinary(*(addressOfchars + 1));
     binNums[0] = *(c);
     binNums[1] = *(c + 1);
     binNums[2] = *(c + 2);
-    r1 = binToDec(3, binNums, 1);
+    r1 = binaryToDecimal(3, binNums, 1);
     
     binNums[0] = *(c + 3);
-    c = hexToBin(*(addressOfchars + 2));
+    c = hexToBinary(*(addressOfchars + 2));
     binNums[1] = *(c);
     binNums[2] = *(c + 1);
-    r2 = binToDec(3, binNums, 1);
+    r2 = binaryToDecimal(3, binNums, 1);
     if (*(c + 2) == 0) {
-        c = hexToBin(*(addressOfchars + 3));
+        c = hexToBinary(*(addressOfchars + 3));
         binNums[0] = *(c + 1);
         binNums[1] = *(c + 2);
         binNums[2] = *(c + 3);
-        r3 = binToDec(3, binNums, 1);
+        r3 = binaryToDecimal(3, binNums, 1);
         
         printf("%s r%d, r%d, r%d\n", "add", r1 , r2, r3);
     } else {
         int binImm5Num[5];
         binImm5Num[0] = *(c + 3);
-        c = hexToBin(*(addressOfchars + 3));
+        c = hexToBinary(*(addressOfchars + 3));
         binImm5Num[1] = *(c);
         binImm5Num[2] = *(c + 1);
         binImm5Num[3] = *(c + 2);
         binImm5Num[4] = *(c + 3);
-        imm5 = binToDec(5, binImm5Num,0);
+        imm5 = binaryToDecimal(5, binImm5Num,0);
         printf("%s r%d, r%d, #%d\n", "add", r1 , r2, imm5);
     }
 }
@@ -318,34 +323,34 @@ void andFunction( char *addressOfchars)
     int binNums[3];
     int r1,r2,r3,imm5 = 0;
     
-    c = hexToBin(*(addressOfchars + 1));
+    c = hexToBinary(*(addressOfchars + 1));
     binNums[0] = *(c);
     binNums[1] = *(c + 1);
     binNums[2] = *(c + 2);
-    r1 = binToDec(3, binNums, 1);
+    r1 = binaryToDecimal(3, binNums, 1);
     
     binNums[0] = *(c + 3);
-    c = hexToBin(*(addressOfchars + 2));
+    c = hexToBinary(*(addressOfchars + 2));
     binNums[1] = *(c);
     binNums[2] = *(c + 1);
-    r2 = binToDec(3, binNums, 1);
+    r2 = binaryToDecimal(3, binNums, 1);
     if (*(c + 2) == 0) {
-        c = hexToBin(*(addressOfchars + 3));
+        c = hexToBinary(*(addressOfchars + 3));
         binNums[0] = *(c + 1);
         binNums[1] = *(c + 2);
         binNums[2] = *(c + 3);
-        r3 = binToDec(3, binNums, 1);
+        r3 = binaryToDecimal(3, binNums, 1);
         
         printf("%s r%d, r%d, r%d\n", "and", r1 , r2, r3);
     } else {
         int binImm5Num[5];
         binImm5Num[0] = *(c + 3);
-        c = hexToBin(*(addressOfchars + 3));
+        c = hexToBinary(*(addressOfchars + 3));
         binImm5Num[1] = *(c);
         binImm5Num[2] = *(c + 1);
         binImm5Num[3] = *(c + 2);
         binImm5Num[4] = *(c + 3);
-        imm5 = binToDec(5, binImm5Num,0);
+        imm5 = binaryToDecimal(5, binImm5Num,0);
         printf("%s r%d, r%d, #%d\n", "and", r1 , r2, imm5);
     }
 }
@@ -360,28 +365,28 @@ void jmpFunction( char *addressOfchars)
     int r1, r2, r3;
     
     //check 000
-    c = hexToBin(*(addressOfchars + 1));
+    c = hexToBinary(*(addressOfchars + 1));
     binNums[0] = *(c);
     binNums[1] = *(c + 1);
     binNums[2] = *(c + 2);
-    r1 = binToDec(3, binNums, 1);
+    r1 = binaryToDecimal(3, binNums, 1);
     
     //get register
     binNums[0] = *(c + 3);
-    c = hexToBin(*(addressOfchars + 2));
+    c = hexToBinary(*(addressOfchars + 2));
     binNums[1] = *(c);
     binNums[2] = *(c + 1);
-    r2 = binToDec(3, binNums, 1);
+    r2 = binaryToDecimal(3, binNums, 1);
 
     //check 000000
     binNums2[0] = *(c + 2);
     binNums2[1] = *(c + 3);
-    c = hexToBin(*(addressOfchars + 3));
+    c = hexToBinary(*(addressOfchars + 3));
     binNums2[2] = *(c);
     binNums2[3] = *(c + 1);
     binNums2[4] = *(c + 2);
     binNums2[5] = *(c + 3);
-    r3 = binToDec(6, binNums2, 1);
+    r3 = binaryToDecimal(6, binNums2, 1);
     
     if (debug == 1){
         printf("jmp messages! r1=%d r2=%d r3=%d\n", r1, r2, r3 );
@@ -412,59 +417,36 @@ void brFunction( char *addressOfchars )
     
     //check n == 0, z == 0, p == 0
     printf("br");
-    c = hexToBin(*(addressOfchars + 1));
+    c = hexToBinary(*(addressOfchars + 1));
     if (*(c) == 1)
         printf("n");
     if (*(c + 1) == 1)
         printf("z");
     if (*(c + 2) == 1)
         printf("p");
-    if ((*(c) == 1) && (*(c + 1) == 1) && (*(c + 2) == 1)) {
+    
+    if (debug == 1)
         printf(" 0x%X", PCintAddress);
-    } else {
+
         //get 9bits PCoffset9
         binNums[0] = *(c + 3);
-        c = hexToBin(*(addressOfchars + 2));
+        c = hexToBinary(*(addressOfchars + 2));
         binNums[1] = *(c);
         binNums[2] = *(c + 1);
         binNums[3] = *(c + 2);
         binNums[4] = *(c + 3);
-        c = hexToBin(*(addressOfchars + 3));
+        c = hexToBinary(*(addressOfchars + 3));
         binNums[5] = *(c);
         binNums[6] = *(c + 1);
         binNums[7] = *(c + 2);
         binNums[8] = *(c + 3);
-        
-        int * currentBinAddress;
-        
-        /*
-        int partOfaddress[9];
-        int i;
-        printf("\npart of address is [");
-        for (i = 0; i < 15; i++) {
-            //partOfaddress[i] = *(pcStarter(7 + i));
-            printf("%d",pcStarter[i]);
-        }
-        printf("]\n");
-
-        currentBinAddress = addBinarys( binNums , partOfaddress , 9);
-        */
-        /*
-        int i;
-        i = binToDec(9, binNums, 1);
-         */
-        
-        //int * pcStarter + current PC
-        
-        
-        
-        
-        
-        //printf(" 0x%d", pcCounter + i);
-    }
     
-
-    printf("\n");
+    
+    
+    int currentPCPoint = addBinaryAndInt(binNums , pcCounter, 9);
+    if(debug == 1)
+        printf(" Deciaml is %d\n", currentPCPoint);
+    printf(" 0x%X\n", PCintAddress + currentPCPoint);
 }
 // end BR
 
@@ -486,56 +468,82 @@ int charToDec( char c){
     return result;
 }
 
+/*  add two binary numbers and return a binary number
+ *
+ *
+ *
+ *  @param      int *       pointer of int[] (1st binary number)
+ *  @param      int         int (2nd integer number)
+ *  @param      int         length of the binary number need to add
+ *
+ *  @return     int         add a binary number and an integer (the result)
+ *
+ *
+ *
+ */
 
-//add two binary numbers
-int * addBinarys( int *num1 , int *num2 , int bits){
-    printf("\nadd two binary numbers:\n[");
+int addBinaryAndInt( int *num1 , int num2 , int bits){
+    int * num3 = decimalToBinary(num2);
+    if (debug == 1){
+        printf("\nInteger to binary [%d]", *(num3+14));
+        printf("\nadd two binary numbers: 2nd integer is %d\n[",num2);
+    }
     int result[bits];
+    
     int i, c = 0;
+    static int resultInt;
+
+
+    if (debug == 1){
+        for (i = 0; i < bits; i++) {
+            printf("%d", num1[i]);
+        }
+        printf("]\n[");
     
-    for (i = 0; i < bits; i++) {
-        printf("%d", num1[i]);
+        for (i = 0; i < bits; i++) {
+            printf("%d", *(num3+i+7));
+        }
+        printf("]\n[");
     }
-    printf("]\n[");
-    
-    for (i = 0; i < bits; i++) {
-        printf("%d", num2[i]);
-    }
-    printf("]\n[");
-    
     
     for (i = (bits - 1); i >= 0; i--) {
-        result[i] = (num1[i] ^ num2[i] ^ c); //a xor b xor c
-        c = ((num1[i] & num2[i]) | (num1[i] &c)) | (num2[i] & c); //ab+bc+ca
+        result[i] = (num1[i] ^ *(num3+i+7) ^ c); //a xor b xor c
+        c = ((num1[i] & *(num3+i+7)) | (num1[i] &c)) | (*(num3+i+7) & c); //ab+bc+ca
     }
     
+    if (debug == 1){
+        //printf("\n[");
+        for (i = 0; i < bits; i++) {
+            printf("%d", result[i]);
+        }
+        printf("]\n");
+    }
     
-    for (i = 0; i < bits; i++) {
-        printf("%d", result[i]);
-    }
-    printf("]\n");
-    /*
-    int i, c = 0;
-    for(i = 0; i < bits ; i++){
-        result[i] = ((num1[i] ^ num2[i]) ^ c); //a xor b xor c
-        c = ((num1[i] & num2[i]) | (num1[i] &c)) | (num2[i] & c); //ab+bc+ca
-    }
-    result[i] = c;
-     */
-    return result;
+    resultInt = binaryToDecimal(bits, result, 1 );
+    
+    
+    return resultInt;
 
 }
 
+/*  decimal numbers to a bit hex number converter
+ *  valid deicmal integer is 0 <= integer <= 65536
+ *
+ *
+ *  @param      int     base number
+ *  @param      int     power factor (valid value >= 0)
+ *
+ *  @return     int     result = x^y
+ *
+ *
+ *
+ */
 
-
-
-
-
-
-// power two numbers
 int power(int num1, int num2){
     int result;
-    if (num2 ==0) {
+    if (num2 < 0){
+        printf("Error, the power factor is %d. It is invalid!\n", num2);
+    } else if(num2 ==0) {
         result = 1;
     } else {
         int i;
@@ -547,17 +555,27 @@ int power(int num1, int num2){
     return result;
 }
 
+/*  decimal numbers to a bit hex number converter
+ *  valid deicmal integer is 0 <= integer <= 65536
+ *
+ *
+ *  @param      int
+ *
+ *  @return     char *      a pointer of char[5], char[5] = '\0'
+ *                          the return value is able to convert to string.
+ *
+ *
+ */
 
-// convert dec to hex 4bits only
-char * decToHex( int n ) /* Function to convert decimal to hexadecimal. */
+char * decimalToHex( int n ) /* Function to convert decimal to hexadecimal. */
 {
     printf("decToHex input value is %d!\n", n);
     char hex[5];
-    int i=0,rem;
-    while (n!=0)
+    int i = 0, rem;
+    while (n != 0)
     {
-        rem=n%16;
-        switch(rem)
+        rem = n % 16;
+        switch (rem)
         {
             case 10:
                 hex[i]='A';
@@ -582,12 +600,12 @@ char * decToHex( int n ) /* Function to convert decimal to hexadecimal. */
                 break;
         }
         ++i;
-        n/=16;
+        n /= 16;
     }
-    hex[i]='\0';
+    hex[i] = '\0';
     printf("HEX value is: %s!\n", hex);
     //strrev(hex);   /* Reverse string */
-    char result[5];
+    static char result[5];
     result[0] = hex[3];
     result[1] = hex[2];
     result[2] = hex[1];
@@ -598,8 +616,21 @@ char * decToHex( int n ) /* Function to convert decimal to hexadecimal. */
     return result;
 }
 
-// binary to decimal
-int binToDec(int length, int *addressOfIntegers, int unsignBin)
+/*  binary number to decimal number converter with 3 params
+ *
+ *
+ *
+ *  @param      int     length of the binary number
+ *  @param      int * = a pointer of int[]
+ *  @param      int     Unsign binary number or Sign binary number
+ *
+ *  @return     int
+ *
+ *
+ *
+ */
+
+int binaryToDecimal(int length, int *addressOfIntegers, int unsignBin)
 {
     if (debug == 1) {
         printf("bin To Dec bin [%dbits] are: [", length);
@@ -639,9 +670,75 @@ int binToDec(int length, int *addressOfIntegers, int unsignBin)
     
 }
 
+/*  a decimal number to  binary number converter
+ *
+ *
+ *
+ *  @param      int
+ *
+ *  @return     int[]  =   a pointer of int[16] 16bits
+ *
+ *
+ *
+ */
 
-// hex to bin return an address of an integer array int[4]
-int * hexToBin(char c)
+int * decimalToBinary(int n)
+{
+    if(debug == 1)
+        printf("\ndecimalToBinary'%d':\n[",n);
+    int c, rem, count = 0;
+    static int pointer[16];
+    int temp[16];
+    
+    for (c = 0; c < 16; c++) {
+        pointer[c] = 0;
+        temp[c] = 0;
+    }
+    
+    while (n >= 0) {
+        if(n == 0){
+            temp[count] = 0;
+            count++;
+            temp[count] = 0;
+            break;
+        } else if (n == 1){
+            temp[count] = 1;
+            break;
+        } else if (n == 2) {
+            temp[count] = 0;
+            count++;
+            temp[count] = 1;
+            break;
+        } else {
+            rem = n % 2;
+            temp[count] = rem;
+            n /= 2;
+            count++;
+        }
+    }
+    for (c = 0; c < 16; c++) {
+        pointer[c] = temp[15 - c];
+        if (debug == 1)
+            printf("%d",pointer[c]);
+    }
+    if (debug == 1)
+        printf("]");
+    return  pointer;
+}
+
+/*  a bit hex to 4 bit binary number converter
+ *
+ *
+ *
+ *  @param      char
+ *
+ *  @return     int[4]  =   a pointer of int[]
+ *
+ *
+ *
+ */
+
+int * hexToBinary(char c)
 {
     if (debug == 1) {
         printf("hex To bin -- char is: %c\n", c);
