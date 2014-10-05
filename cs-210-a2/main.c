@@ -15,27 +15,32 @@
 
 
 int * hexToBinary( char c ); //return an integer array
+int hexToDecimal(const char *);
+
 int binaryToDecimal( int, int *, int );
 char * decimalToHex( int );
-int addBinaryAndInt( int * , int , int);
+
 int * decimalToBinary( int );
 
+int addBinaryAndInt( const int * , int , int);
 
 int power(int,int);
-int charToDec( char );
 
 void addFunction( char * );
 void andFunction( char * );
 void jmpFunction( char * );
 void brFunction( char * );
+
+static int PCintAddress;
+static int pcCounter = 0;
+
+
 int debug = 0;
 void createOBJ( const char * );
 void instructions( const char * );
 void setPCAddress( const char * );
 
-static int * pcStarter;
-static int PCintAddress;
-static int pcCounter = 0;
+
 
 
 int main(int argc, const char * argv[]) {
@@ -48,31 +53,6 @@ int main(int argc, const char * argv[]) {
             printf("arg is: %s \n", argv[1]);
         createOBJ(argv[1]);
         if (argc > 2) {
-    
-            /*
-            // conveter 2nd argu to int
-            char *p;
-            
-            errno = 0;
-            long conv = strtol(argv[2], &p, 10);
-            
-            // Check for errors: e.g., the string does not represent an integer
-            // or the integer is larger than int
-            if (errno != 0 || *p != '\0' || conv > INT_MAX) {
-                // Put here the handling of the error, like exiting the program with
-                // an error message
-                printf("Please input a valid value, an integer is requested!\n");
-                return 0;
-            } else {
-                // No error
-                pcCounter = (int)conv;
-                //pcStarter = (int)conv;
-                if (debug == 1)
-                    printf("1st Loaded PC counter is: 0x%d\n", pcCounter);
-
-                if (debug == 1)
-                    printf("point to the next PC counter is: 0x%d\n", pcCounter);
-            }*/
 
             setPCAddress( argv[2] ); //read hex value;
             
@@ -94,27 +74,8 @@ void setPCAddress( const char *argu ){
     if (debug == 1)
         printf("loading address is [0x%s]\n", argu);
     
-    int address[16];
-    int *i;
-    if (debug == 1)
-        printf("loading address [");
-    
-    int j,k = 0, l = 0;
-    for (j = 0; j < 4; j++) {
-        
-        i = hexToBinary( argu[j] );
-        for (l = 0; l < 4; l++) {
-            address[k] = i[l];
-            if (debug == 1)
-                printf("%i",address[k]);
-            k++;
-        }
-    }
-    if (debug == 1)
-        printf("]\n");
-    pcStarter = address;
-    
-    PCintAddress = binaryToDecimal(16,pcStarter,1);
+    PCintAddress = hexToDecimal(argu);
+    //PCintAddress = binaryToDecimal(16,pcStarter,1);
     
     if (debug == 1) {
         printf("address in Deciaml is %i\n", PCintAddress);
@@ -126,7 +87,8 @@ void setPCAddress( const char *argu ){
     char *pcAddress;
     pcAddress = decToHex( PCintAddress );
         
-    printf("address after decToHex is %c%c%c%c!\n", *pcAddress, *(pcAddress + 1), *(pcAddress + 2), *(pcAddress + 3));*/
+    printf("address after decToHex is %c%c%c%c!\n", *pcAddress, *(pcAddress + 1), *(pcAddress + 2), *(pcAddress + 3));
+ */
 
 }
 
@@ -450,23 +412,6 @@ void brFunction( char *addressOfchars )
 }
 // end BR
 
-// char To decimal
-
-int charToDec( char c){
-    int result;
-    switch (c) {
-        case '1':
-            result = 1;
-            break;
-        case '0':
-            result = 0;
-            break;
-        default:
-            printf("Error, invalid value in char To decimal.\n");
-            break;
-    }
-    return result;
-}
 
 /*  add two binary numbers and return a binary number
  *
@@ -482,7 +427,7 @@ int charToDec( char c){
  *
  */
 
-int addBinaryAndInt( int *num1 , int num2 , int bits){
+int addBinaryAndInt( const int *num1 , int num2 , int bits){
     int * num3 = decimalToBinary(num2);
     if (debug == 1){
         printf("\nInteger to binary [%d]", *(num3+14));
@@ -886,4 +831,32 @@ int * hexToBinary(char c)
         printf("hex To bin int[] is: [%d %d %d %d]\n", binComb[0],binComb[1],binComb[2],binComb[3]);
     
     return binComb;
+}
+
+/*  a hex number to decimal number converter
+ *
+ *
+ *
+ *  @param      char * pointer of char[]
+ *
+ *  @return     int
+ *
+ *
+ *
+ */
+
+int hexToDecimal(const char * hex)   /* Function to convert hexadecimal to decimal. */
+{
+    int i, length, sum=0;
+    for(length=0; hex[length]!='\0'; ++length);
+    for(i=0; hex[i]!='\0'; ++i, --length)
+    {
+        if(hex[i]>='0' && hex[i]<='9')
+            sum+=(hex[i]-'0')*pow(16,length-1);
+        if(hex[i]>='A' && hex[i]<='F')
+            sum+=(hex[i]-55)*pow(16,length-1);
+        if(hex[i]>='a' && hex[i]<='f')
+            sum+=(hex[i]-87)*pow(16,length-1);
+    }
+    return sum;
 }
