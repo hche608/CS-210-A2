@@ -852,11 +852,11 @@ int hexToDecimal(const char * hex)   /* Function to convert hexadecimal to decim
     for(i=0; hex[i]!='\0'; ++i, --length)
     {
         if(hex[i]>='0' && hex[i]<='9')
-            sum+=(hex[i]-'0')*pow(16,length-1);
+            sum+=(hex[i]-'0')*power(16,length-1);
         if(hex[i]>='A' && hex[i]<='F')
-            sum+=(hex[i]-55)*pow(16,length-1);
+            sum+=(hex[i]-55)*power(16,length-1);
         if(hex[i]>='a' && hex[i]<='f')
-            sum+=(hex[i]-87)*pow(16,length-1);
+            sum+=(hex[i]-87)*power(16,length-1);
     }
     return sum;
 }
