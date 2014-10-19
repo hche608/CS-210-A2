@@ -49,9 +49,10 @@ int main(int argc, const char * argv[]) {
         printf("Error, need at least one arugs!\n[complete file name] or\n[complete file name] [an integer]\n");
 
     } else if (argc < 4){
-        if (debug == 1)
+        if (debug == 1){
             printf("arg is: %s \n", argv[1]);
-        createOBJ(argv[1]);
+            createOBJ(argv[1]);
+        }
         if (argc > 2) {
 
             setPCAddress( argv[2] ); //read hex value;
@@ -83,18 +84,8 @@ void setPCAddress( const char *argu ){
         printf("address in Hex is 0x%x\n", PCintAddress);
     }
 
-/*
-    char *pcAddress;
-    pcAddress = decToHex( PCintAddress );
-        
-    printf("address after decToHex is %c%c%c%c!\n", *pcAddress, *(pcAddress + 1), *(pcAddress + 2), *(pcAddress + 3));
- */
-
 }
-
-
-
-
+/*
 //create a file name as argv[1]
 void createOBJ( const char *argu)
 {
@@ -113,6 +104,7 @@ void createOBJ( const char *argu)
     fclose(fp);
     //end create a file
 }
+*/
 
 //identify instructions
 void instructions( const char *argu)
