@@ -20,7 +20,7 @@ static int PC_int_Address;
 static int pcCounter = 0;
 
 int debug = 0;
-void createOBJ( const char * );
+//void createOBJ( const char * );
 void instruction_detector( const char * );
 void setPCAddress( const char * );
 
@@ -30,7 +30,7 @@ int main(int argc, const char * argv[]) {
     } else if (argc < 4){
         if (debug == 1){
             printf("arg is: %s \n", argv[1]);
-            createOBJ(argv[1]);
+            //createOBJ(argv[1]);
         }
         if (argc > 2) {
             setPCAddress( argv[2] ); //read hex value;
@@ -57,7 +57,7 @@ void setPCAddress( const char *argu ){
     }
 
 }
-
+/*
 //create a file name as argv[1]
 void createOBJ( const char *argu)
 {
@@ -76,7 +76,7 @@ void createOBJ( const char *argu)
     fclose(fp);
     //end create a file
 }
-
+*/
 
 //identify instructions
 void instruction_detector( const char *argu)
@@ -138,51 +138,44 @@ void instruction_detector( const char *argu)
 // ADD section
 void addFunction( int num )
 {
-    int temp1,r1,r2,r3 = 0;
-    int opcode = num >> 12;
-
-    temp1 = num >> 9;
-    r1 = temp1 % 8;
-    temp1 = num >> 6;
-    r2 = temp1 % 8;
-    opcode = num >> 5;
-    if (opcode%2 == 0) {
+    int opcode,r1,r2,r3 = 0;
+    
+    opcode = num >> 9;
+    r1 = opcode % 8;
+    opcode = num >> 6;
+    r2 = opcode % 8;
+    if ((num >> 5) % 2 == 0) {
         r3 = num % 8;
         printf("add r%d, r%d r%d\n",r1,r2,r3);
     } else {
-        temp1 = (num >> 4) % 2;
-        r3 = (num % 16) - (temp1 * 16);
+        r3 = (num % 16) - (((num >> 4) % 2) * 16);
         printf("add r%d, r%d #%d\n",r1,r2,r3);
     }
-    
 }
 // end ADD
 
 // AND Section
 
-void andFunction( int num)
+void andFunction( int num )
 {
-    int temp1,r1,r2,r3 = 0;
-    int opcode = num >> 12;
+    int opcode,r1,r2,r3 = 0;
     
-    temp1 = num >> 9;
-    r1 = temp1 % 8;
-    temp1 = num >> 6;
-    r2 = temp1 % 8;
-    opcode = num >> 5;
-    if (opcode%2 == 0) {
+    opcode = num >> 9;
+    r1 = opcode % 8;
+    opcode = num >> 6;
+    r2 = opcode % 8;
+    if ((num >> 5) % 2 == 0) {
         r3 = num % 8;
         printf("and r%d, r%d r%d\n",r1,r2,r3);
     } else {
-        temp1 = (num >> 4) % 2;
-        r3 = (num % 16) - (temp1 * 16);
+        r3 = (num % 16) - (((num >> 4) % 2) * 16);
         printf("and r%d, r%d #%d\n",r1,r2,r3);
     }
 }
 // end AND
 
 // JMP Section
-void jmpFunction( int num)
+void jmpFunction( int num )
 {
     int opcode = (num >> 6) % 8;
     if (opcode == 7) {
@@ -198,20 +191,17 @@ void jmpFunction( int num)
 void brFunction( int num )
 {
     int currentPCPoint = 0;
-    int opcode = num >> 11;
     
     printf("br");
-    if (opcode % 2 == 1) {
+    if ((num >> 11) % 2 == 1) {
         printf("n");
     }
     
-    opcode = num >> 10;
-    if (opcode % 2 == 1) {
+    if ((num >> 10) % 2 == 1) {
         printf("z");
     }
     
-    opcode = num >> 9;
-    if (opcode % 2 == 1) {
+    if ((num >> 9) % 2 == 1) {
         printf("p");
     }
     currentPCPoint = ((num + pcCounter) % 512);
